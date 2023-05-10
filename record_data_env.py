@@ -1,14 +1,18 @@
 from __future__ import annotations
 
-from copy import deepcopy
 import pickle
+from copy import deepcopy
+import numpy as np
 
 import gymnasium as gym
+import matplotlib.pyplot as plt
 import pygame
 from gymnasium import Env
 from minigrid.core.actions import Actions
+from minigrid.core.constants import TILE_PIXELS
 from minigrid.minigrid_env import MiniGridEnv
 from minigrid.wrappers import ImgObsWrapper, RGBImgPartialObsWrapper
+
 from plot_data import PlotData
 
 
@@ -48,9 +52,11 @@ class RecordDataEnv:
         )
 
         if terminated:
+            self.data.append(deepcopy(self.episode_data))
             print("terminated!")
             self.reset(self.seed)
         elif truncated:
+            self.data.append(deepcopy(self.episode_data))
             print("truncated!")
             self.reset(self.seed)
         else:
@@ -59,12 +65,16 @@ class RecordDataEnv:
     def reset(self, seed=None):
         if self.data is None:
             self.data = []
-        else:
-            self.data.append(deepcopy(self.episode_data))
 
         self.env.reset(seed=seed)
         self.env.render()
         self.episode_data = []
+        self.episode_data.append(
+            {
+                "agent_pos": self.env.agent_pos,
+                "agent_dir": self.env.agent_dir,
+            }
+        )
 
     def key_handler(self, event):
         key: str = event.key
@@ -99,12 +109,37 @@ class RecordDataEnv:
         with open(self.filename, "wb") as handle:
             pickle.dump(self.data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-        img = self.plot_data()
-        breakpoint()
+        self.plot_data()
 
     def plot_data(self):
-        breakpoint()
         plot = PlotData(self.env.width, self.env.height, self.env.grid.grid)
-        img = plot.render(32)
+        img = plot.render(TILE_PIXELS)
+
+        fig, ax = plt.subplots(1, 1)
+        plt.imshow(img)
+
+        for i, data in enumerate(self.data):
+            _pos = np.array([d["agent_pos"] for d in data if True])
+            ax.plot(
+                TILE_PIXELS * _pos[:, 0] + int(TILE_PIXELS / 2),
+                TILE_PIXELS * _pos[:, 1] + int(TILE_PIXELS / 2),
+                color="cornflowerblue",
+                alpha=(i + 1) / len(self.data),
+                linewidth=int(TILE_PIXELS / 10),
+            )
+
+        # Turn off x/y axis numbering/ticks
+        ax.xaxis.set_ticks_position("none")
+        ax.yaxis.set_ticks_position("none")
+        _ = ax.set_xticklabels([])
+        _ = ax.set_yticklabels([])
+
+        plt.savefig(
+            "imgs/minigrid_record.png",
+            dpi=200,
+            transparent=False,
+            bbox_inches="tight",
+        )
+        plt.show()
 
         return img

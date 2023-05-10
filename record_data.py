@@ -19,7 +19,7 @@ def main():
         type=str,
         help="gym environment to load",
         choices=gym.envs.registry.keys(),
-        default="MiniGrid-MultiRoom-N6-v0",
+        default="MiniGrid-Empty-5x5-v0",
     )
     parser.add_argument(
         "--seed",
