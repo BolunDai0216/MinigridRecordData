@@ -73,6 +73,7 @@ class RecordDataEnv:
             {
                 "agent_pos": self.env.agent_pos,
                 "agent_dir": self.env.agent_dir,
+                "mission": self.env.mission,
             }
         )
 
