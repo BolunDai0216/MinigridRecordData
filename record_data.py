@@ -67,6 +67,8 @@ def main():
     record_data = RecordDataEnv(env, seed=args.seed, key_map=key_map)
     record_data.start()
 
+    print(record_data.rewards)
+
     with open("data/key_map.pickle", "wb") as file:
         pickle.dump(key_map, file)
 

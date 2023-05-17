@@ -31,6 +31,8 @@ class RecordDataEnv:
         self.episode_data = None
         self.filename = save_to
         self.key_map = key_map
+        self.rewards = []
+        self.counter = 0
 
     def start(self):
         """Start the window display with blocking event loop"""
@@ -59,10 +61,12 @@ class RecordDataEnv:
         if terminated:
             self.data.append(deepcopy(self.episode_data))
             print("terminated!")
+            self.rewards.append(reward)
             self.reset(self.seed)
         elif truncated:
             self.data.append(deepcopy(self.episode_data))
             print("truncated!")
+            self.rewards.append(reward)
             self.reset(self.seed)
         else:
             self.env.render()
@@ -70,6 +74,9 @@ class RecordDataEnv:
     def reset(self, seed=None):
         if self.data is None:
             self.data = []
+        else:
+            self.plot_data(self.counter)
+            self.counter += 1
 
         self.env.reset(seed=seed)
         self.env.render()
@@ -116,24 +123,21 @@ class RecordDataEnv:
         with open(self.filename, "wb") as handle:
             pickle.dump(self.data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-        self.plot_data()
-
-    def plot_data(self):
+    def plot_data(self, counter):
         plot = PlotData(self.env.width, self.env.height, self.env.grid.grid)
         img = plot.render(TILE_PIXELS)
 
         fig, ax = plt.subplots(1, 1)
         plt.imshow(img)
 
-        for i, data in enumerate(self.data):
-            _pos = np.array([d["agent_pos"] for d in data if True])
-            ax.plot(
-                TILE_PIXELS * _pos[:, 0] + int(TILE_PIXELS / 2),
-                TILE_PIXELS * _pos[:, 1] + int(TILE_PIXELS / 2),
-                color="cornflowerblue",
-                alpha=(i + 1) / len(self.data),
-                linewidth=int(TILE_PIXELS / 10),
-            )
+        _pos = np.array([d["agent_pos"] for d in self.data[-1] if True])
+        ax.plot(
+            TILE_PIXELS * _pos[:, 0] + int(TILE_PIXELS / 2),
+            TILE_PIXELS * _pos[:, 1] + int(TILE_PIXELS / 2),
+            color="cornflowerblue",
+            alpha=1.0,
+            linewidth=int(TILE_PIXELS / 10),
+        )
 
         # Turn off x/y axis numbering/ticks
         ax.xaxis.set_ticks_position("none")
@@ -142,7 +146,7 @@ class RecordDataEnv:
         _ = ax.set_yticklabels([])
 
         plt.savefig(
-            "imgs/minigrid_record.png",
+            f"imgs/minigrid_record{counter}.png",
             dpi=200,
             transparent=False,
             bbox_inches="tight",
