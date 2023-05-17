@@ -84,6 +84,7 @@ class RecordDataEnv:
         if key == "escape":
             self.save_data()
             self.env.close()
+            self.closed = True
             return
         if key == "backspace":
             self.reset()
@@ -141,6 +142,6 @@ class RecordDataEnv:
             transparent=False,
             bbox_inches="tight",
         )
-        plt.show()
+        # plt.show()
 
         return img
