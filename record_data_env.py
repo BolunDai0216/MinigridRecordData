@@ -18,7 +18,11 @@ from plot_data import PlotData
 
 class RecordDataEnv:
     def __init__(
-        self, env: Env, seed=None, save_to="data/recorded_data.pickle"
+        self,
+        env: Env,
+        seed=None,
+        save_to="data/recorded_data.pickle",
+        key_map=["1", "2", "3", "4", "5", "6", "7", "8", "9"],
     ) -> None:
         self.env = env
         self.seed = seed
@@ -26,6 +30,7 @@ class RecordDataEnv:
         self.data = None
         self.episode_data = None
         self.filename = save_to
+        self.key_map = key_map
 
     def start(self):
         """Start the window display with blocking event loop"""
@@ -91,15 +96,15 @@ class RecordDataEnv:
             return
 
         key_to_action = {
-            "left": Actions.left,
-            "right": Actions.right,
-            "up": Actions.forward,
-            "space": Actions.toggle,
-            "pageup": Actions.pickup,
-            "pagedown": Actions.drop,
-            "tab": Actions.pickup,
-            "left shift": Actions.drop,
-            "enter": Actions.done,
+            self.key_map[0]: Actions.left,
+            self.key_map[1]: Actions.right,
+            self.key_map[2]: Actions.forward,
+            self.key_map[3]: Actions.toggle,
+            self.key_map[4]: Actions.pickup,
+            self.key_map[5]: Actions.drop,
+            self.key_map[6]: Actions.pickup,
+            self.key_map[7]: Actions.drop,
+            self.key_map[8]: Actions.done,
         }
         if key in key_to_action.keys():
             action = key_to_action[key]
@@ -142,6 +147,5 @@ class RecordDataEnv:
             transparent=False,
             bbox_inches="tight",
         )
-        # plt.show()
 
         return img

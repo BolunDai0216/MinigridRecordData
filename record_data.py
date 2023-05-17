@@ -1,4 +1,6 @@
 import pickle
+import random
+
 
 import gymnasium as gym
 import pygame
@@ -19,7 +21,7 @@ def main():
         type=str,
         help="gym environment to load",
         choices=gym.envs.registry.keys(),
-        default="MiniGrid-Empty-5x5-v0",
+        default="MiniGrid-FourRooms-v0",
     )
     parser.add_argument(
         "--seed",
@@ -59,8 +61,14 @@ def main():
         screen_size=args.screen_size,
     )
 
-    record_data = RecordDataEnv(env, seed=args.seed)
+    key_map = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+    random.shuffle(key_map)
+
+    record_data = RecordDataEnv(env, seed=args.seed, key_map=key_map)
     record_data.start()
+
+    with open("data/key_map.pickle", "wb") as file:
+        pickle.dump(key_map, file)
 
 
 if __name__ == "__main__":
