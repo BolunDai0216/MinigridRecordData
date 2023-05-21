@@ -3,6 +3,8 @@ from __future__ import annotations
 import pickle
 from copy import deepcopy
 import numpy as np
+from datetime import datetime
+from time import time
 
 import gymnasium as gym
 import matplotlib.pyplot as plt
@@ -21,7 +23,7 @@ class RecordDataEnv:
         self,
         env: Env,
         seed=None,
-        save_to="data/recorded_data.pickle",
+        save_to="data/recorded_data",
         key_map=["1", "2", "3", "4", "5", "6", "7", "8", "9"],
     ) -> None:
         self.env = env
@@ -29,10 +31,11 @@ class RecordDataEnv:
         self.closed = False
         self.data = None
         self.episode_data = None
-        self.filename = save_to
         self.key_map = key_map
         self.rewards = []
         self.counter = 0
+        self.stamp = datetime.fromtimestamp(time()).strftime("%Y%m%d-%H%M%S")
+        self.filename = save_to + f"{self.stamp}.pickle"
 
     def start(self):
         """Start the window display with blocking event loop"""
@@ -55,6 +58,7 @@ class RecordDataEnv:
             {
                 "agent_pos": self.env.agent_pos,
                 "agent_dir": self.env.agent_dir,
+                "reward": reward,
             }
         )
 
@@ -86,6 +90,7 @@ class RecordDataEnv:
                 "agent_pos": self.env.agent_pos,
                 "agent_dir": self.env.agent_dir,
                 "mission": self.env.mission,
+                "reward": 0.0,
             }
         )
 
@@ -146,7 +151,7 @@ class RecordDataEnv:
         _ = ax.set_yticklabels([])
 
         plt.savefig(
-            f"imgs/minigrid_record{counter}.png",
+            f"imgs/minigrid_record{counter}_{self.stamp}.png",
             dpi=200,
             transparent=False,
             bbox_inches="tight",
