@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import pickle
 from copy import deepcopy
-import numpy as np
 from datetime import datetime
 from time import time
 
 import gymnasium as gym
 import matplotlib.pyplot as plt
+import numpy as np
 import pygame
 from gymnasium import Env
 from minigrid.core.actions import Actions
@@ -35,7 +35,7 @@ class RecordDataEnv:
         self.rewards = []
         self.counter = 0
         self.stamp = datetime.fromtimestamp(time()).strftime("%Y%m%d-%H%M%S")
-        self.filename = save_to + f"{self.stamp}.pickle"
+        self.filename = save_to + f"_{self.stamp}.pickle"
 
     def start(self):
         """Start the window display with blocking event loop"""
