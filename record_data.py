@@ -72,6 +72,9 @@ def main():
     with open("data/key_map.pickle", "wb") as file:
         pickle.dump(key_map, file)
 
+    with open(f"data/key_map_{record_data.stamp}.pickle", "wb") as file:
+        pickle.dump(key_map, file)
+
 
 if __name__ == "__main__":
     main()
